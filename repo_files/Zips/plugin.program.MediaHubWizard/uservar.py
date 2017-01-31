@@ -4,10 +4,10 @@ import os, xbmc, xbmcaddon
 ### User Edit Variables #################################
 #########################################################
 ADDON_ID       = xbmcaddon.Addon().getAddonInfo('id')
-ADDONTITLE     = '[COLOR blue]M[/COLOR][COLOR white]edia Hub Wizard[/COLOR]'
+ADDONTITLE     = '[COLOR blue]M[/COLOR][COLOR white]edia Hub IPTV Wizard[/COLOR]'
 EXCLUDES       = [ADDON_ID]
 # Text File with build info in it.
-BUILDFILE      = 'http://mkodi.co.uk/wizard/wizard.txt'
+BUILDFILE      = 'https://raw.githubusercontent.com/sClarkeIsBack/MediaH/master/wizard/wizard.txt'
 # How often you would list it to check for build updates in days
 # 0 being every startup of kodi
 UPDATECHECK    = 0
