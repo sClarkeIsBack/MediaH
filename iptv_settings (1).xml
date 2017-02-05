@@ -1,0 +1,6 @@
+<settings>
+    <setting id="Password" value="{password}" />
+    <setting id="Username" value="{username}" />
+    <setting id="improve" value="false" />
+    <setting id="improvefs" value="false" />
+</settings>
