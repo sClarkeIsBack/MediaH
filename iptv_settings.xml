@@ -1,6 +1,8 @@
 <settings>
-    <setting id="Password" value="{password}" />
-    <setting id="Username" value="{username}" />
-    <setting id="improve" value="false" />
-    <setting id="improvefs" value="false" />
+<category label="Main">
+     <setting id="Username" type="text" label="Username" default=""/>
+     <setting id="Password" type="text" option="writeable,hidden" label="Password" default=""/>
+	 <setting id="first" type="bool" label="32013" visible="false" default="true"/>
+	 <setting label="Run a Speed Test" type="action" action="RunPlugin(plugin://plugin.video.MediaHubIPTV/?mode=9)"/>
+</category>
 </settings>
