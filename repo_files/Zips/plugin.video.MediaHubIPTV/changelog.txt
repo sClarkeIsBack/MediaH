@@ -1,3 +1,1 @@
-V1 - Release
-v2 - bug fix's
-v3 - advanced settings tweak
+2.1.2 - Base Completely Re-Written. Adding VOD Meta info, Search Function, Trailer Function, Speed Test Function, Integrated PVR TV Guide & Auto Setup, AdvancedSettings.XML Dialog Selection
