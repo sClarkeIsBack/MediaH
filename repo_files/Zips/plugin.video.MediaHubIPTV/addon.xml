@@ -1,20 +1,18 @@
-<?xml version="1.1" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.MediaHubIPTV"
-       name="[COLOR blue]M[/COLOR]edia Hub IPTV"
-       version="2.1.4"
-       provider-name="sClarke">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-	<import addon="script.module.requests" />
-  </requires>
-  <extension point="xbmc.python.pluginsource"
-            library="default.py">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <addon id="plugin.video.MediaHubIPTV" version="2.1.5" name="MediaHub IPTV" provider-name="sClarke">
+    <requires>
+        <import addon="xbmc.python" version="2.1.0"/>        
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <summary lang="en">Supplier of Great Quality and Stable Streams</summary>
-    <language>en</language>
-    <description lang="en">MediaHubIPTV Official Addon - Supplier of Great Quality and Stable Streams</description>
-     <platform>all</platform>
-  </extension>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>MediaHubIPTV</summary>
+        <description>MediaHubIPTV - Offering the best in IPTV and VOD</description>
+        <disclaimer>MediaHubIPTV</disclaimer>
+        <language>en</language>
+        <platform>all</platform>
+        <source></source>
+        <email></email>
+    </extension>
 </addon>
