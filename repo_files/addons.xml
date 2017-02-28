@@ -1,7 +1,7 @@
 <addons>
 <addon id="plugin.video.MediaHubIPTV"
        name="[COLOR blue]M[/COLOR]edia Hub IPTV"
-       version="2.1.5"
+       version="2.1.6"
        provider-name="sClarke">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -12,7 +12,7 @@
         <provides>video</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en">Supplier of Great Quality and Stable Streams</summary>
+    <summary lang="en">MediaHubIPTV</summary>
     <language>en</language>
     <description lang="en">MediaHubIPTV Official Addon - Supplier of Great Quality and Stable Streams</description>
      <platform>all</platform>
