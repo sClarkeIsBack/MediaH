@@ -1,6 +1,9 @@
-#############Imports#############
-import xbmc,xbmcaddon,xbmcgui,xbmcplugin,base64,os,re,requests,string,sys,urllib,json,urlparse,datetime,zipfile,shutil
-from resources.modules import client,control,tools
+ #############Imports#############
+import xbmc,xbmcaddon,xbmcgui,xbmcplugin,base64,os,re,unicodedata,requests,time,string,sys,urllib,urllib2,json,urlparse,datetime,zipfile,shutil
+from resources.modules import client,control,tools,shortlinks
+from resources.ivue import ivuesetup
+from datetime import date
+import xml.etree.ElementTree as ElementTree
 #################################
 
 #############Defined Strings#############
@@ -19,6 +22,10 @@ live_url     = '%s:%s/enigma2.php?username=%s&password=%s&type=get_live_categori
 vod_url      = '%s:%s/enigma2.php?username=%s&password=%s&type=get_vod_categories'%(host,port,username,password)
 panel_api    = '%s:%s/panel_api.php?username=%s&password=%s'%(host,port,username,password)
 play_url     = '%s:%s/live/%s/%s/'%(host,port,username,password)
+
+
+Guide = xbmc.translatePath(os.path.join('special://home/addons/plugin.video.MediaHubIPTV/resources/catchup', 'guide.xml'))
+GuideLoc = xbmc.translatePath(os.path.join('special://home/addons/plugin.video.MediaHubIPTV/resources/catchup', 'g'))
 
 advanced_settings           =  xbmc.translatePath('special://home/addons/'+addon_id+'/resources/advanced_settings')
 advanced_settings_target    =  xbmc.translatePath(os.path.join('special://home/userdata','advancedsettings.xml'))
@@ -45,8 +52,8 @@ def start():
 			line2 = "Welcome to MediaHub IPTV" 
 			line3 = ('[COLOR blue]%s[/COLOR]'%user)
 			xbmcgui.Dialog().ok('MediaHub IPTV', line1, line2, line3)
-			pvrsetup()
-			asettings()
+			tvguidesetup()
+			addonsettings('ADS2','')
 			xbmc.executebuiltin('Container.Refresh')
 			home()
 	else:
@@ -54,21 +61,24 @@ def start():
 		auth = tools.OPEN_URL(auth)
 		if not auth=="":
 			tools.addDir('Account Information','url',6,icon,fanart,'')
-			tools.addDir('Live IPTV','live',1,icon,fanart,'')
-			if xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)'):
+			tools.addDir('Live TV','live',1,icon,fanart,'')
+			tools.addDir('Catchup TV','url',12,icon,fanart,'')
+			if xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)') or xbmc.getCondVisibility('System.HasAddon(script.ivueguide)'):
 				tools.addDir('TV Guide','pvr',7,icon,fanart,'')
 			tools.addDir('VOD','vod',3,icon,fanart,'')
 			tools.addDir('Search','url',5,icon,fanart,'')
 			tools.addDir('Settings','url',8,icon,fanart,'')
-			
+			tools.addDir('Extras','url',16,icon,fanart,'')
 def home():
 	tools.addDir('Account Information','url',6,icon,fanart,'')
-	tools.addDir('Live IPTV','live',1,icon,fanart,'')
+	tools.addDir('Live TV','live',1,icon,fanart,'')
+	tools.addDir('Catchup TV','url',12,icon,fanart,'')
 	if xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)'):
 		tools.addDir('TV Guide','pvr',7,icon,fanart,'')
 	tools.addDir('VOD','vod',3,icon,fanart,'')
 	tools.addDir('Search','',5,icon,fanart,'')
 	tools.addDir('Settings','url',8,icon,fanart,'')
+	tools.addDir('Extras','url',16,icon,fanart,'')
 		
 def livecategory(url):
 	open = tools.OPEN_URL(live_url)
@@ -132,7 +142,129 @@ def vod(url):
 				tools.addDir(name,url,4,thumb,fanart,base64.b64decode(desc))
 		
 		
+##########################################
+def catchup():
+    loginurl   = "http://mediahubiptv.ddns.net:4545/get.php?username=" + username + "&password=" + password + "&type=m3u_plus&output=ts"
+    try:
+        connection = urllib2.urlopen(loginurl)
+        print connection.getcode()
+        connection.close()
+        #playlist found, user active & login correct, proceed to addon
+        pass
+        
+    except urllib2.HTTPError, e:
+        print e.getcode()
+        dialog.ok("[COLOR white]Expired Account[/COLOR]",'[COLOR white]You cannot use this service with an expired account[/COLOR]',' ','[COLOR white]Please check your account information[/COLOR]')
+        sys.exit(1)
+        xbmc.executebuiltin("Dialog.Close(busydialog)")
+
+    url = "%s:%s/xmltv.php?username=%s&password=%s"%(host,port,username,password)
+    DownloaderClass(url,GuideLoc + "uide.xml")
+    
+    f = open(Guide, 'r+')
+    input = open(Guide).read().decode('UTF-8')
+    output = unicodedata.normalize('NFKD', input).encode('ASCII', 'ignore')
+    f.write(output)
+    f.truncate()
+    f.close()
+    listcatchup()
+		
+def listcatchup():
+	open = tools.OPEN_URL(panel_api)
+	all  = tools.regex_get_all(open,'{"num','direct')
+	for a in all:
+		if '"tv_archive":1' in a:
+			name = tools.regex_from_to(a,'"epg_channel_id":"','"')
+			thumb= tools.regex_from_to(a,'"stream_icon":"','"').replace('\/','/')
+			tools.addDir(name.replace('ENT:','[COLOR blue]ENT:[/COLOR]').replace('DOC:','[COLOR blue]DOC:[/COLOR]').replace('MOV:','[COLOR blue]MOV:[/COLOR]').replace('SSS:','[COLOR blue]SSS[/COLOR]').replace('BTS:','[COLOR blue]BTS:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),'url',13,thumb,fanart,'')
+			
+
+def tvarchive(name):
+    name = str(name.replace('[COLOR blue]ENT:[/COLOR]','ENT:').replace('[COLOR blue]DOC:[/COLOR]','DOC:').replace('[COLOR blue]MOV:[/COLOR]','MOV').replace('[COLOR blue]SSSS[/COLOR]','SSS:').replace('[COLOR blue]BTS:[/COLOR]','BTS:').replace('[COLOR blue]INT:[/COLOR]','INT:').replace('[COLOR blue]DE:[/COLOR]','DE:').replace('[COLOR blue]FR:[/COLOR]','FR:').replace('[COLOR blue]PL:[/COLOR]','PL:').replace('[COLOR blue]AR:[/COLOR]','AR:').replace('[COLOR blue]LIVE:[/COLOR]','LIVE:').replace('[COLOR blue]ES:[/COLOR]','ES:').replace('[COLOR blue]IN:[/COLOR]','IN:').replace('[COLOR blue]PK:[/COLOR]','PK'))
+    filename = open(Guide)
+    tree = ElementTree.parse(filename)
+    pony = "apples"
+    import datetime as dt
+    from datetime import time
+    date3 = datetime.datetime.now() - datetime.timedelta(days=5)
+    date = str(date3)
+    now = str(datetime.datetime.now()).replace('-','').replace(':','').replace(' ','')
+    programmes = tree.findall("programme")
+    for programme in programmes:
+        if name in programme.attrib.get('channel'):
+            showtime = programme.attrib.get('start')
+            head, sep, tail = showtime.partition(' +')
+            date = str(date).replace('-','').replace(':','').replace(' ','')
+            year, month, day = showtime.partition('2017')
+            kanalinimi = programme.find('title').text + showtime
+            day = day[:-6]
+            if head > date:
+                if head < now:
+                    head2 = head
+                    head2 = head2[:4] + '/' + head2[4:]
+                    head = head[:4] + '-' + head[4:]
+                    head2 = head2[:7] + '/' + head2[7:]
+                    head = head[:7] + '-' + head[7:]
+                    head2 = head2[:10] + ' - ' + head2[10:]
+                    head = head[:10] + ':' + head[10:]
+                    head2 = head2[:15] + ':' + head2[15:]
+                    head = head[:13] + '-' + head[13:]
+                    head2 = head2[:-2]
+                    head = head[:-2]
+                    poo1 = ("%s:%s/streaming/timeshift.php?username=%s&password=%s&stream=%s&start=")%(host,port,username,password,'308')
+                    pony = poo1 + str(head) + "&duration=240"
+                    head2 = '[COLOR blue]%s - [/COLOR]'%head2 
+                    kanalinimi = str(head2)+ programme.find('title').text
+                    desc  = programme.find('desc').text
+                    tools.addDir(kanalinimi,pony,4,icon,fanart,desc)
+                    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+					
+def DownloaderClass(url, dest):
+    dp = xbmcgui.DialogProgress()
+    dp.create('Fetching latest Catch Up',"Fetching latest Catch Up...",' ', ' ')
+    dp.update(0)
+    start_time=time.time()
+    urllib.urlretrieve(url, dest, lambda nb, bs, fs: _pbhook(nb, bs, fs, dp, start_time))
+
+def _pbhook(numblocks, blocksize, filesize, dp, start_time):
+        try: 
+            percent = min(numblocks * blocksize * 100 / filesize, 100) 
+            currently_downloaded = float(numblocks) * blocksize / (1024 * 1024) 
+            kbps_speed = numblocks * blocksize / (time.time() - start_time) 
+            if kbps_speed > 0: 
+                eta = (filesize - numblocks * blocksize) / kbps_speed 
+            else: 
+                eta = 0 
+            kbps_speed = kbps_speed / 1024 
+            mbps_speed = kbps_speed / 1024 
+            total = float(filesize) / (1024 * 1024) 
+            mbs = '[COLOR white]%.02f MB of less than 5MB[/COLOR]' % (currently_downloaded)
+            e = '[COLOR white]Speed:  %.02f Mb/s ' % mbps_speed  + '[/COLOR]'
+            dp.update(percent, mbs, e)
+        except: 
+            percent = 100 
+            dp.update(percent) 
+        if dp.iscanceled():
+            dialog = xbmcgui.Dialog()
+            dialog.ok("MediaHubIPTV", 'The download was cancelled.')
+				
+            sys.exit()
+            dp.close()
+#####################################################################
+
+def tvguide():
+	if xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)') and xbmc.getCondVisibility('System.HasAddon(script.ivueguide)'):
+		dialog = xbmcgui.Dialog().select('Select a TV Guide', ['PVR TV Guide','iVue TV Guide'])
+		if dialog==0:
+			xbmc.executebuiltin('ActivateWindow(TVGuide)')
+		elif dialog==1:
+			xbmc.executebuiltin('RunAddon(script.ivueguide)')
+	elif not xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)') and xbmc.getCondVisibility('System.HasAddon(script.ivueguide)'):
+		xbmc.executebuiltin('RunAddon(script.ivueguide)')
+	elif xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)') and not xbmc.getCondVisibility('System.HasAddon(script.ivueguide)'):
+		xbmc.executebuiltin('ActivateWindow(TVGuide)')
 def stream_video(url):
+	url = str(url).replace('USERNAME',username).replace('PASSWORD',password)
 	liz = xbmcgui.ListItem('', iconImage='DefaultVideo.png', thumbnailImage=icon)
 	liz.setInfo(type='Video', infoLabels={'Title': '', 'Plot': ''})
 	liz.setProperty('IsPlayable','true')
@@ -173,11 +305,8 @@ def settingsmenu():
 		META = '[COLOR lime]ON[/COLOR]'
 	else:
 		META = '[COLOR red]OFF[/COLOR]'
-	if not xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)'):
-		tools.addDir('Setup PVR TV Guide','PVR',10,icon,fanart,'')
+	tools.addDir('Edit Advanced Settings','ADS',10,icon,fanart,'')
 	tools.addDir('META for VOD is %s'%META,'META',10,icon,fanart,META)
-	tools.addDir('Run a Speed Test','ST',10,icon,fanart,'')
-	tools.addDir('Clear Cache','CC',10,icon,fanart,'')
 	tools.addDir('Log Out','LO',10,icon,fanart,'')
 	
 
@@ -186,6 +315,55 @@ def addonsettings(url,description):
 		tools.clear_cache()
 	elif url =="AS":
 		xbmc.executebuiltin('Addon.OpenSettings(%s)'%addon_id)
+	elif url =="ADS":
+		dialog = xbmcgui.Dialog().select('Edit Advanced Settings', ['Enable Fire TV Stick AS','Enable Fire TV AS','Enable 1GB Ram or Lower AS','Enable 2GB Ram or Higher AS','Enable Nvidia Shield AS','Disable AS'])
+		if dialog==0:
+			advancedsettings('stick')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+		elif dialog==1:
+			advancedsettings('firetv')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+		elif dialog==2:
+			advancedsettings('lessthan')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+		elif dialog==3:
+			advancedsettings('morethan')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+		elif dialog==4:
+			advancedsettings('shield')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+		elif dialog==5:
+			advancedsettings('remove')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Advanced Settings Removed')
+	elif url =="ADS2":
+		dialog = xbmcgui.Dialog().select('Select Your Device Or Closest To', ['Fire TV Stick ','Fire TV','1GB Ram or Lower','2GB Ram or Higher','Nvidia Shield'])
+		if dialog==0:
+			advancedsettings('stick')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+		elif dialog==1:
+			advancedsettings('firetv')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+		elif dialog==2:
+			advancedsettings('lessthan')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+		elif dialog==3:
+			advancedsettings('morethan')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+		elif dialog==4:
+			advancedsettings('shield')
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'Set Advanced Settings')
+	elif url =="tv":
+		dialog = xbmcgui.Dialog().select('Select a TV Guide to Setup', ['iVue TV Guide','PVR TV Guide','Both'])
+		if dialog==0:
+			ivueint()
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'iVue Integration Complete')
+		elif dialog==1:
+			pvrsetup()
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'PVR Integration Complete')
+		elif dialog==2:
+			pvrsetup()
+			ivueint()
+			xbmcgui.Dialog().ok('MediaHub IPTV', 'PVR & iVue Integration Complete')
 	elif url =="ST":
 		xbmc.executebuiltin('Runscript("special://home/addons/plugin.video.MediaHubIPTV/resources/modules/speedtest.py")')
 	elif url =="META":
@@ -200,20 +378,33 @@ def addonsettings(url,description):
 		xbmcaddon.Addon().setSetting('Password','')
 		xbmc.executebuiltin('XBMC.ActivateWindow(Videos,addons://sources/video/)')
 		xbmc.executebuiltin('Container.Refresh')
-	elif url =="PVR":
-		choice = xbmcgui.Dialog().yesno('MediaHub IPTV', 'Would you like us to Setup the TV Guide for You?', yeslabel='Yes', nolabel='No')
-		if choice:
-			correctPVR()
-		else:
-			return
-
+		
+def advancedsettings(device):
+	if device == 'stick':
+		file = open(os.path.join(advanced_settings, 'stick.xml'))
+	elif device == 'firetv':
+		file = open(os.path.join(advanced_settings, 'firetv.xml'))
+	elif device == 'lessthan':
+		file = open(os.path.join(advanced_settings, 'lessthan1GB.xml'))
+	elif device == 'morethan':
+		file = open(os.path.join(advanced_settings, 'morethan1GB.xml'))
+	elif device == 'shield':
+		file = open(os.path.join(advanced_settings, 'shield.xml'))
+	elif device == 'remove':
+		os.remove(advanced_settings_target)
+	
+	try:
+		read = file.read()
+		f = open(advanced_settings_target, mode='w+')
+		f.write(read)
+		f.close()
+	except:
+		pass
+		
 	
 def pvrsetup():
-	choice = xbmcgui.Dialog().yesno('MediaHub IPTV', 'Would you like us to Setup the TV Guide for You?', yeslabel='Yes', nolabel='No')
-	if choice:
-		correctPVR()
-	else:
-		return
+	correctPVR()
+	return
 		
 		
 def asettings():
@@ -271,13 +462,19 @@ def accountinfo():
 		password  = tools.regex_from_to(open,'"password":"','"')
 		status    = tools.regex_from_to(open,'"status":"','"')
 		connects  = tools.regex_from_to(open,'"max_connections":"','"')
+		active    = tools.regex_from_to(open,'"active_cons":"','"')
 		expiry    = tools.regex_from_to(open,'"exp_date":"','"')
 		expiry    = datetime.datetime.fromtimestamp(int(expiry)).strftime('%d/%m/%Y - %H:%M')
+		ip        = tools.getlocalip()
+		extip     = tools.getexternalip()
 		tools.addDir('[COLOR blue]Username :[/COLOR] '+username,'','',icon,fanart,'')
 		tools.addDir('[COLOR blue]Password :[/COLOR] '+password,'','',icon,fanart,'')
 		tools.addDir('[COLOR blue]Expiry Date:[/COLOR] '+expiry,'','',icon,fanart,'')
 		tools.addDir('[COLOR blue]Account Status :[/COLOR] %s'%status,'','',icon,fanart,'')
+		tools.addDir('[COLOR blue]Current Connections:[/COLOR] '+ active,'','',icon,fanart,'')
 		tools.addDir('[COLOR blue]Allowed Connections:[/COLOR] '+connects,'','',icon,fanart,'')
+		tools.addDir('[COLOR blue]Local IP Address:[/COLOR] '+ip,'','',icon,fanart,'')
+		tools.addDir('[COLOR blue]External IP Address:[/COLOR] '+extip,'','',icon,fanart,'')
 	except:pass
 		
 	
@@ -302,7 +499,82 @@ def correctPVR():
 	moist.setSetting(id='m3uCache', value="false")
 	moist.setSetting(id='epgCache', value="false")
 	xbmc.executebuiltin("Container.Refresh")
-		
+	
+def ivueint():
+	ivuesetup.iVueInt()
+	
+def tvguidesetup():
+		dialog = xbmcgui.Dialog().yesno('MediaHubIPTV','Would You like us to Setup the TV Guide for You?')
+		if dialog:
+			dialog = xbmcgui.Dialog().select('Select a TV Guide to Setup', ['iVue TV Guide','PVR TV Guide','Both'])
+			if dialog==0:
+				ivueint()
+				xbmcgui.Dialog().ok('MediaHub IPTV', 'iVue Integration Complete')
+			elif dialog==1:
+				pvrsetup()
+				xbmcgui.Dialog().ok('MediaHub IPTV', 'PVR Integration Complete')
+			elif dialog==2:
+				pvrsetup()
+				ivueint()
+				xbmcgui.Dialog().ok('MediaHub IPTV', 'PVR & iVue Integration Complete')
+
+def num2day(num):
+	if num =="0":
+		day = 'monday'
+	elif num=="1":
+		day = 'tuesday'
+	elif num=="2":
+		day = 'wednesday'
+	elif num=="3":
+		day = 'thursday'
+	elif num=="4":
+		day = 'friday'
+	elif num=="5":
+		day = 'saturday'
+	elif num=="6":
+		day = 'sunday'
+	return day
+	
+def extras():
+	tools.addDir('Create a Short M3U & EPG URL','url',17,icon,fanart,'')
+	tools.addDir('Integrate With TV Guide','tv',10,icon,fanart,'')
+	tools.addDir('Run a Speed Test','ST',10,icon,fanart,'')
+	tools.addDir('Football Guide','url',19,icon,fanart,'')
+	tools.addDir('Clear Cache','CC',10,icon,fanart,'')
+	
+def get():
+	url  = 'http://www.wheresthematch.com/live-football-on-tv/'
+	open = tools.OPEN_URL(url)
+	all_lists = tools.regex_get_all(open,'<td class="home-team">','</tr>')
+	tools.addDir('[COLOR red]Only Shows Main Matches Find More at - http://liveonsat.com[/COLOR]','url',500,icon,fanart,'')
+	for a in all_lists:
+		name = re.compile('<em class="">(.*?)<em class="">(.*?)</em>.*?<em class="">(.*?)</em>',re.DOTALL).findall(a)
+		for home,v,away in name:
+			koff  = tools.regex_from_to(a,'<strong>','</strong>')
+			chan = tools.regex_from_to(a,'class="channel-name">','</span>')
+			if chan == "Live Stream":
+				chan = 'Not Televised'
+			if chan == 'LFC TV':
+				chan = 'LFCTV'
+			thumb = tools.regex_from_to(a,'    <img src="','"')
+			if 'Bet 365 Live' not in chan:
+					tools.addDir(koff+' - '+str(home).replace('</em>','')+' '+v+'  '+away+'   -   [COLOR blue]%s[/COLOR]'%chan,'url',18,'http://www.wheresthematch.com'+str(thumb).replace('..',''),fanart,chan)
+
+def footballguidesearch(description):
+	if description=='BBC1 Scotland':
+		tools.addDir('BBC1 Scotland','http://a.files.bbci.co.uk/media/live/manifesto/audio_video/simulcast/hls/uk/abr_hdtv/ak/bbc_one_scotland_hd.m3u8',4,icon,fanart,'')
+	else:
+		xbmc.log(str(description))
+		open = tools.OPEN_URL(panel_api)
+		all_chans = tools.regex_get_all(open,'{"num":','epg')
+		for a in all_chans:
+			name = tools.regex_from_to(a,'name":"','"').replace('\/','/')
+			url  = tools.regex_from_to(a,'"stream_id":"','"')
+			thumb= tools.regex_from_to(a,'stream_icon":"','"').replace('\/','/')
+			chan = description.lower()
+			if chan in name.lower():
+				tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),play_url+url+'.ts',4,thumb,fanart,'')
+			
 params=tools.get_params()
 url=None
 name=None
@@ -363,7 +635,7 @@ elif mode==6:
 	accountinfo()
 	
 elif mode==7:
-	xbmc.executebuiltin('ActivateWindow(TVGuide)')
+	tvguide()
 	
 elif mode==8:
 	settingsmenu()
@@ -378,7 +650,29 @@ elif mode==10:
 	
 elif mode==11:
 	pvrsetup()
+	
+elif mode==12:
+	catchup()
 
+elif mode==13:
+	tvarchive(name)
+	
+elif mode==14:
+	listcatchup2()
+	
+elif mode==15:
+	ivueint()
+	
+elif mode==16:
+	extras()
+	
+elif mode==17:
+	shortlinks.Get()
 
+elif mode==18:
+	footballguidesearch(description)
+	
+elif mode==19:
+	get()
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))

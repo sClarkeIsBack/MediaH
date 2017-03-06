@@ -1,5 +1,4 @@
-import os,re,sys,xbmc,json,base64,client,control,string,urllib,urlparse,requests,shutil,xbmcplugin,xbmcgui
-
+import os,re,sys,xbmc,json,base64,client,control,string,urllib,urlparse,requests,shutil,xbmcplugin,xbmcgui,socket
 ADDONTITLE     = 'MediaHub IPTV'
 
 def regex_from_to(text, from_string, to_string, excluding=True):
@@ -25,7 +24,7 @@ def addDir(name,url,mode,iconimage,fanart,description):
 	if mode==4:
 		liz.setProperty("IsPlayable","true")
 		ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=False)
-	elif mode==7 or mode==10:
+	elif mode==7 or mode==10 or mode==17:
 		liz.setInfo( type="Video", infoLabels={"Title": name,"Plot":description})
 		ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=False)
 	else:
@@ -51,7 +50,7 @@ def addDirMeta(name,url,mode,iconimage,fanart,description,year,cast,rating,runti
 
 def OPEN_URL(url):
 	headers = {}
-	headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36'
+	headers['User-Agent'] = 'TheWizardIsHere'
 	link = requests.session().get(url, headers=headers, verify=False).text
 	link = link.encode('ascii', 'ignore')
 	return link
@@ -184,3 +183,14 @@ class Trailer:
             return url
         except:
             return
+			
+def getlocalip():
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.connect(('8.8.8.8', 0))
+	s = s.getsockname()[0]
+	return s
+			
+def getexternalip():
+	open = OPEN_URL('http://canyouseeme.org/')
+	ip = re.search('(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)',open)
+	return str(ip.group())
