@@ -36,6 +36,7 @@ def buildcleanurl(url):
 	return url
 def start():
 	if username=="":
+		xbmc.executebuiltin('UpdateAddonRepos')
 		user = userpopup()
 		passw= passpopup()
 		control.setSetting('Username',user)
@@ -59,6 +60,7 @@ def start():
 			xbmc.executebuiltin('Container.Refresh')
 			home()
 	else:
+		xbmc.executebuiltin('UpdateAddonRepos')
 		auth = '%s:%s/enigma2.php?username=%s&password=%s&type=get_vod_categories'%(host,port,username,password)
 		auth = tools.OPEN_URL(auth)
 		if not auth=="":
@@ -313,6 +315,11 @@ def settingsmenu():
 		META = '[COLOR lime]ON[/COLOR]'
 	else:
 		META = '[COLOR red]OFF[/COLOR]'
+	if xbmcaddon.Addon().getSetting('update')=='true':
+		UPDATE = '[COLOR lime]ON[/COLOR]'
+	else:
+		UPDATE = '[COLOR red]OFF[/COLOR]'
+	tools.addDir('Update on Startup is %s'%UPDATE,'UPDATE',10,icon,fanart,UPDATE)
 	tools.addDir('Edit Advanced Settings','ADS',10,icon,fanart,'')
 	tools.addDir('META for VOD is %s'%META,'META',10,icon,fanart,META)
 	tools.addDir('Log Out','LO',10,icon,fanart,'')
@@ -387,6 +394,14 @@ def addonsettings(url,description):
 		xbmcaddon.Addon().setSetting('Password','')
 		xbmc.executebuiltin('XBMC.ActivateWindow(Videos,addons://sources/video/)')
 		xbmc.executebuiltin('Container.Refresh')
+	elif url =="UPDATE":
+		if 'ON' in description:
+			xbmcaddon.Addon().setSetting('update','false')
+			xbmc.executebuiltin('Container.Refresh')
+		else:
+			xbmcaddon.Addon().setSetting('update','true')
+			xbmc.executebuiltin('Container.Refresh')
+	
 		
 def advancedsettings(device):
 	if device == 'stick':
