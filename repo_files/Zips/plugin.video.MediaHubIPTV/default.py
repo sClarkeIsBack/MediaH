@@ -31,7 +31,9 @@ advanced_settings           =  xbmc.translatePath('special://home/addons/'+addon
 advanced_settings_target    =  xbmc.translatePath(os.path.join('special://home/userdata','advancedsettings.xml'))
 #########################################
 
-
+def buildcleanurl(url):
+	url = str(url).replace('USERNAME',username).replace('PASSWORD',password)
+	return url
 def start():
 	if username=="":
 		user = userpopup()
@@ -81,6 +83,7 @@ def home():
 	tools.addDir('Extras','url',16,icon,fanart,'')
 		
 def livecategory(url):
+	
 	open = tools.OPEN_URL(live_url)
 	all_cats = tools.regex_get_all(open,'<channel>','</channel>')
 	for a in all_cats:
@@ -90,6 +93,7 @@ def livecategory(url):
 		tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),url1,2,icon,fanart,'')
 		
 def Livelist(url):
+	url  = buildcleanurl(url)
 	open = tools.OPEN_URL(url)
 	all_cats = tools.regex_get_all(open,'<channel>','</channel>')
 	for a in all_cats:
@@ -107,6 +111,7 @@ def vod(url):
 	if url =="vod":
 		open = tools.OPEN_URL(vod_url)
 	else:
+		url  = buildcleanurl(url)
 		open = tools.OPEN_URL(url)
 	all_cats = tools.regex_get_all(open,'<channel>','</channel>')
 	for a in all_cats:
@@ -176,10 +181,11 @@ def listcatchup():
 		if '"tv_archive":1' in a:
 			name = tools.regex_from_to(a,'"epg_channel_id":"','"')
 			thumb= tools.regex_from_to(a,'"stream_icon":"','"').replace('\/','/')
-			tools.addDir(name.replace('ENT:','[COLOR blue]ENT:[/COLOR]').replace('DOC:','[COLOR blue]DOC:[/COLOR]').replace('MOV:','[COLOR blue]MOV:[/COLOR]').replace('SSS:','[COLOR blue]SSS[/COLOR]').replace('BTS:','[COLOR blue]BTS:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),'url',13,thumb,fanart,'')
+			id   = tools.regex_from_to(a,'stream_id":"','"')
+			tools.addDir(name.replace('ENT:','[COLOR blue]ENT:[/COLOR]').replace('DOC:','[COLOR blue]DOC:[/COLOR]').replace('MOV:','[COLOR blue]MOV:[/COLOR]').replace('SSS:','[COLOR blue]SSS[/COLOR]').replace('BTS:','[COLOR blue]BTS:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),'url',13,thumb,fanart,id)
 			
 
-def tvarchive(name):
+def tvarchive(name,description):
     name = str(name.replace('[COLOR blue]ENT:[/COLOR]','ENT:').replace('[COLOR blue]DOC:[/COLOR]','DOC:').replace('[COLOR blue]MOV:[/COLOR]','MOV').replace('[COLOR blue]SSSS[/COLOR]','SSS:').replace('[COLOR blue]BTS:[/COLOR]','BTS:').replace('[COLOR blue]INT:[/COLOR]','INT:').replace('[COLOR blue]DE:[/COLOR]','DE:').replace('[COLOR blue]FR:[/COLOR]','FR:').replace('[COLOR blue]PL:[/COLOR]','PL:').replace('[COLOR blue]AR:[/COLOR]','AR:').replace('[COLOR blue]LIVE:[/COLOR]','LIVE:').replace('[COLOR blue]ES:[/COLOR]','ES:').replace('[COLOR blue]IN:[/COLOR]','IN:').replace('[COLOR blue]PK:[/COLOR]','PK'))
     filename = open(Guide)
     tree = ElementTree.parse(filename)
@@ -211,13 +217,14 @@ def tvarchive(name):
                     head = head[:13] + '-' + head[13:]
                     head2 = head2[:-2]
                     head = head[:-2]
-                    poo1 = ("%s:%s/streaming/timeshift.php?username=%s&password=%s&stream=%s&start=")%(host,port,username,password,'308')
+                    poo1 = ("%s:%s/streaming/timeshift.php?username=%s&password=%s&stream=%s&start=")%(host,port,username,password,description)
                     pony = poo1 + str(head) + "&duration=240"
                     head2 = '[COLOR blue]%s - [/COLOR]'%head2 
                     kanalinimi = str(head2)+ programme.find('title').text
                     desc  = programme.find('desc').text
                     tools.addDir(kanalinimi,pony,4,icon,fanart,desc)
                     xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+	
 					
 def DownloaderClass(url, dest):
     dp = xbmcgui.DialogProgress()
@@ -264,6 +271,7 @@ def tvguide():
 	elif xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)') and not xbmc.getCondVisibility('System.HasAddon(script.ivueguide)'):
 		xbmc.executebuiltin('ActivateWindow(TVGuide)')
 def stream_video(url):
+	url = buildcleanurl(url)
 	url = str(url).replace('USERNAME',username).replace('PASSWORD',password)
 	liz = xbmcgui.ListItem('', iconImage='DefaultVideo.png', thumbnailImage=icon)
 	liz.setInfo(type='Video', infoLabels={'Title': '', 'Plot': ''})
@@ -295,9 +303,9 @@ def search():
 		url  = tools.regex_from_to(a,'"stream_id":"','"')
 		thumb= tools.regex_from_to(a,'stream_icon":"','"').replace('\/','/')
 		if text in name.lower():
-			tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),play_url+url+'.ts',4,thumb,fanart,'')
+			tools.addDir(name,play_url+url+'.ts',4,thumb,fanart,'')
 		elif text not in name.lower() and text in name:
-			tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),play_url+url+'.ts',4,thumb,fanart,'')
+			tools.addDir(name,play_url+url+'.ts',4,thumb,fanart,'')
 
 	
 def settingsmenu():
@@ -311,6 +319,7 @@ def settingsmenu():
 	
 
 def addonsettings(url,description):
+	url  = buildcleanurl(url)
 	if   url =="CC":
 		tools.clear_cache()
 	elif url =="AS":
@@ -655,7 +664,7 @@ elif mode==12:
 	catchup()
 
 elif mode==13:
-	tvarchive(name)
+	tvarchive(name,description)
 	
 elif mode==14:
 	listcatchup2()
