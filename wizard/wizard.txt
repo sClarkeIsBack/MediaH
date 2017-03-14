@@ -39,13 +39,14 @@ theme="http://"
 icon="https://s16.postimg.org/pk5b6e11h/Sky_Logo_2004_Transparent.png"
 fanart="https://postimg.org/image/6ze5b7zot/][img]https://s30.postimg.org/6ze5b7zot/fanart.jpg"
 
-name="G test"
-version="2.3"
-url="http://gammaiptv.tk/GammaStreams/Build/GammaBuild.zip"
+name="- test1"
+version="1.0"
+url="https://archive.org/download/samemilyonline_gmail_Kodi_20170314/Kodi.zip"
 gui="http://"
 kodi="16.1"
 theme="http://"
 icon="https://s30.postimg.org/7dfhatjsd/icon.png"
 fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
+
 
 
