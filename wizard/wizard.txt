@@ -4,49 +4,10 @@ version="1.4"
 zip="https://raw.githubusercontent.com/sClarkeIsBack/MediaH/master/wizard/plugin.program.MediaHubWizard.zip"
 
 name="- MediaHub Full Premium Build"
-version="2.3"
-url="https://archive.org/download/samemilyonline_gmail_Kodi_20170119/Kodi.zip" #without prompt - https://archive.org/download/samemilyonline_gmail_Kodi_20161108_2049/Kodi.zip
+version="2.4"
+url="https://archive.org/download/samemilyonline_gmail_New/new.zip" - old - https://archive.org/download/samemilyonline_gmail_Kodi_20170119/Kodi.zip
 gui="http://"
 kodi="16.1"
 theme="http://"
 icon="https://s30.postimg.org/7dfhatjsd/icon.png"
 fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
-
-name="- MediaHub Entertainment Premium Build"
-version="1.0"
-url="https://archive.org/download/entertainment_201611/entertainment.zip"
-gui="http://"
-kodi="16.1"
-theme="http://"
-icon="https://s30.postimg.org/7dfhatjsd/icon.png"
-fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
-
-name="- MediaHub Sports Premium Build"
-version="1.0"
-url="https://archive.org/download/sports_201611/sports.zip"
-gui="http://"
-kodi="16.1"
-theme="http://"
-icon="https://s30.postimg.org/7dfhatjsd/icon.png"
-fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
-
-name="- MediaHub Sky Build"
-version="1.1"
-url="https://archive.org/download/SkyBuild_20161114/Kodi.zip"
-gui="http://"
-kodi="16.1"
-theme="http://"
-icon="https://s16.postimg.org/pk5b6e11h/Sky_Logo_2004_Transparent.png"
-fanart="https://postimg.org/image/6ze5b7zot/][img]https://s30.postimg.org/6ze5b7zot/fanart.jpg"
-
-name="- test1"
-version="1.4"
-url="https://archive.org/download/samemilyonline_gmail_New/new.zip"
-gui="http://"
-kodi="16.1"
-theme="http://"
-icon="https://s30.postimg.org/7dfhatjsd/icon.png"
-fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
-
-
-
