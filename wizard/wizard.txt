@@ -41,7 +41,7 @@ fanart="https://postimg.org/image/6ze5b7zot/][img]https://s30.postimg.org/6ze5b7
 
 name="- test1"
 version="1.0"
-url="https://archive.org/download/samemilyonline_gmail_Kodi_20170314/Kodi.zip"
+url="https://archive.org/download/samemilyonline_gmail_Kodi_20170314/Kodi"
 gui="http://"
 kodi="16.1"
 theme="http://"
