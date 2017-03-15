@@ -194,3 +194,30 @@ def getexternalip():
 	open = OPEN_URL('http://canyouseeme.org/')
 	ip = re.search('(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)',open)
 	return str(ip.group())
+	
+def MonthNumToName(num):
+	if '01' in num:
+		month = 'January'
+	elif '02' in num:
+		month = 'Febuary'
+	elif '03' in num:
+		month = 'March'
+	elif '04' in num:
+		month = 'April'
+	elif '05' in num:
+		month = 'May'
+	elif '06' in num:
+		month = 'June'
+	elif '07' in num:
+		month = 'July'
+	elif '08' in num:
+		month = 'Augast'
+	elif '09' in num:
+		month = 'September'
+	elif '10' in num:
+		month = 'October'
+	elif '11' in num:
+		month = 'November'
+	elif '12' in num:
+		month = 'December'
+	return month

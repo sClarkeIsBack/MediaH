@@ -36,7 +36,6 @@ def buildcleanurl(url):
 	return url
 def start():
 	if username=="":
-		xbmc.executebuiltin('UpdateAddonRepos')
 		user = userpopup()
 		passw= passpopup()
 		control.setSetting('Username',user)
@@ -60,7 +59,6 @@ def start():
 			xbmc.executebuiltin('Container.Refresh')
 			home()
 	else:
-		xbmc.executebuiltin('UpdateAddonRepos')
 		auth = '%s:%s/enigma2.php?username=%s&password=%s&type=get_vod_categories'%(host,port,username,password)
 		auth = tools.OPEN_URL(auth)
 		if not auth=="":
@@ -319,7 +317,6 @@ def settingsmenu():
 		UPDATE = '[COLOR lime]ON[/COLOR]'
 	else:
 		UPDATE = '[COLOR red]OFF[/COLOR]'
-	tools.addDir('Update on Startup is %s'%UPDATE,'UPDATE',10,icon,fanart,UPDATE)
 	tools.addDir('Edit Advanced Settings','ADS',10,icon,fanart,'')
 	tools.addDir('META for VOD is %s'%META,'META',10,icon,fanart,META)
 	tools.addDir('Log Out','LO',10,icon,fanart,'')
@@ -482,23 +479,28 @@ def passpopup():
 def accountinfo():
 	open = tools.OPEN_URL(panel_api)
 	try:
-		username  = tools.regex_from_to(open,'"username":"','"')
-		password  = tools.regex_from_to(open,'"password":"','"')
-		status    = tools.regex_from_to(open,'"status":"','"')
-		connects  = tools.regex_from_to(open,'"max_connections":"','"')
-		active    = tools.regex_from_to(open,'"active_cons":"','"')
-		expiry    = tools.regex_from_to(open,'"exp_date":"','"')
-		expiry    = datetime.datetime.fromtimestamp(int(expiry)).strftime('%d/%m/%Y - %H:%M')
-		ip        = tools.getlocalip()
-		extip     = tools.getexternalip()
-		tools.addDir('[COLOR blue]Username :[/COLOR] '+username,'','',icon,fanart,'')
-		tools.addDir('[COLOR blue]Password :[/COLOR] '+password,'','',icon,fanart,'')
-		tools.addDir('[COLOR blue]Expiry Date:[/COLOR] '+expiry,'','',icon,fanart,'')
-		tools.addDir('[COLOR blue]Account Status :[/COLOR] %s'%status,'','',icon,fanart,'')
-		tools.addDir('[COLOR blue]Current Connections:[/COLOR] '+ active,'','',icon,fanart,'')
-		tools.addDir('[COLOR blue]Allowed Connections:[/COLOR] '+connects,'','',icon,fanart,'')
-		tools.addDir('[COLOR blue]Local IP Address:[/COLOR] '+ip,'','',icon,fanart,'')
-		tools.addDir('[COLOR blue]External IP Address:[/COLOR] '+extip,'','',icon,fanart,'')
+		username   = tools.regex_from_to(open,'"username":"','"')
+		password   = tools.regex_from_to(open,'"password":"','"')
+		status     = tools.regex_from_to(open,'"status":"','"')
+		connects   = tools.regex_from_to(open,'"max_connections":"','"')
+		active     = tools.regex_from_to(open,'"active_cons":"','"')
+		expiry     = tools.regex_from_to(open,'"exp_date":"','"')
+		expiry     = datetime.datetime.fromtimestamp(int(expiry)).strftime('%d/%m/%Y - %H:%M')
+		expreg     = re.compile('^(.*?)/(.*?)/(.*?)$',re.DOTALL).findall(expiry)
+		for day,month,year in expreg:
+			month     = tools.MonthNumToName(month)
+			year      = re.sub(' -.*?$','',year)
+			expiry    = month+' '+day+' - '+year
+			ip        = tools.getlocalip()
+			extip     = tools.getexternalip()
+			tools.addDir('[COLOR blue]Username :[/COLOR] '+username,'','',icon,fanart,'')
+			tools.addDir('[COLOR blue]Password :[/COLOR] '+password,'','',icon,fanart,'')
+			tools.addDir('[COLOR blue]Expiry Date:[/COLOR] '+expiry,'','',icon,fanart,'')
+			tools.addDir('[COLOR blue]Account Status :[/COLOR] %s'%status,'','',icon,fanart,'')
+			tools.addDir('[COLOR blue]Current Connections:[/COLOR] '+ active,'','',icon,fanart,'')
+			tools.addDir('[COLOR blue]Allowed Connections:[/COLOR] '+connects,'','',icon,fanart,'')
+			tools.addDir('[COLOR blue]Local IP Address:[/COLOR] '+ip,'','',icon,fanart,'')
+			tools.addDir('[COLOR blue]External IP Address:[/COLOR] '+extip,'','',icon,fanart,'')
 	except:pass
 		
 	
