@@ -29,6 +29,8 @@ GuideLoc = xbmc.translatePath(os.path.join('special://home/addons/plugin.video.M
 
 advanced_settings           =  xbmc.translatePath('special://home/addons/'+addon_id+'/resources/advanced_settings')
 advanced_settings_target    =  xbmc.translatePath(os.path.join('special://home/userdata','advancedsettings.xml'))
+
+KODIV        = float(xbmc.getInfoLabel("System.BuildVersion")[:4])
 #########################################
 
 def buildcleanurl(url):
@@ -477,8 +479,8 @@ def passpopup():
 		
 		
 def accountinfo():
-	open = tools.OPEN_URL(panel_api)
 	try:
+		open = tools.OPEN_URL(panel_api)
 		username   = tools.regex_from_to(open,'"username":"','"')
 		password   = tools.regex_from_to(open,'"password":"','"')
 		status     = tools.regex_from_to(open,'"status":"','"')
@@ -501,7 +503,9 @@ def accountinfo():
 			tools.addDir('[COLOR blue]Allowed Connections:[/COLOR] '+connects,'','',icon,fanart,'')
 			tools.addDir('[COLOR blue]Local IP Address:[/COLOR] '+ip,'','',icon,fanart,'')
 			tools.addDir('[COLOR blue]External IP Address:[/COLOR] '+extip,'','',icon,fanart,'')
-	except:pass
+			tools.addDir('[COLOR blue]Kodi Version:[/COLOR] '+str(KODIV),'','',icon,fanart,'')
+	except:
+		pass
 		
 	
 def correctPVR():
@@ -527,7 +531,14 @@ def correctPVR():
 	xbmc.executebuiltin("Container.Refresh")
 	
 def ivueint():
+	xbmc.executebuiltin("ActivateWindow(busydialog)")
 	ivuesetup.iVueInt()
+	xbmc.executebuiltin("Dialog.Close(busydialog)")
+	if str(KODIV).startswith('17'):
+		activate  = '{"jsonrpc":"2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"script.ivueguide","enabled":true}, "id":1}'
+		activate2 = '{"jsonrpc":"2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"xbmc.repo.ivueguide","enabled":true}, "id":1}'
+		xbmc.executeJSONRPC(activate)
+		xbmc.executeJSONRPC(activate2)
 	
 def tvguidesetup():
 		dialog = xbmcgui.Dialog().yesno('MediaHubIPTV','Would You like us to Setup the TV Guide for You?')
@@ -693,7 +704,7 @@ elif mode==16:
 	extras()
 	
 elif mode==17:
-	shortlinks.Get()
+	shortlinks.showlinks()
 
 elif mode==18:
 	footballguidesearch(description)

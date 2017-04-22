@@ -44,7 +44,7 @@ def iVueInt():
 	iVueFold = xbmc.translatePath(os.path.join('special://home/addons/plugin.video.MediaHubIPTV/resources/ivue'))
 	iVue_DATA = xbmc.translatePath(os.path.join('special://home/userdata/addon_data/script.ivueguide/'))
 	if not xbmc.getCondVisibility('System.HasAddon(script.ivueguide)'):
-		install('iVue','https://raw.githubusercontent.com/totaltec2014/ivue2/master/script.ivueguide/script.ivueguide-3.0.3.zip')
+		install('iVue','https://raw.githubusercontent.com/totaltec2014/ivue2/master/script.ivueguide/script.ivueguide-3.0.9.zip')
 		install('iVue','https://raw.githubusercontent.com/totaltec2014/ivue2/master/xbmc.repo.ivueguide/xbmc.repo.ivueguide-0.0.1.zip')
 		xbmc.executebuiltin("UpdateAddonRepos")
 		xbmc.executebuiltin("UpdateLocalAddons")
