@@ -14,7 +14,6 @@
   <extension point="xbmc.addon.metadata">
     <summary lang="en">http://mediahubiptv.co.uk</summary>
     <language>en</language>
-	<whatsnew>Leave a Review & Report a Channel from within the Addon!</whatsnew>
     <description lang="en">MediaHubIPTV Official Addon - Supplier of Great Quality and Stable Streams</description>
      <platform>all</platform>
   </extension>
