@@ -27,7 +27,7 @@ def addDir(name,url,mode,iconimage,fanart,description):
 		cm.append(('Report This Channel','XBMC.RunPlugin(plugin://plugin.video.MediaHubIPTV/?mode=20&url='+str(name)+')'))
 		liz.addContextMenuItems(cm,replaceItems=True)
 		ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=False)
-	elif mode==7 or mode==10 or mode==17:
+	elif mode==7 or mode==10 or mode==17 or mode==21:
 		liz.setInfo( type="Video", infoLabels={"Title": name,"Plot":description})
 		ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=False)
 	else:

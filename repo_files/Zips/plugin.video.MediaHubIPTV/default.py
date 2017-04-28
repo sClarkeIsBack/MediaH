@@ -4,6 +4,8 @@ from resources.modules import client,control,tools,shortlinks
 from resources.ivue import ivuesetup
 from datetime import date
 import xml.etree.ElementTree as ElementTree
+
+
 #################################
 
 #############Defined Strings#############
@@ -29,6 +31,8 @@ GuideLoc = xbmc.translatePath(os.path.join('special://home/addons/plugin.video.M
 
 advanced_settings           =  xbmc.translatePath('special://home/addons/'+addon_id+'/resources/advanced_settings')
 advanced_settings_target    =  xbmc.translatePath(os.path.join('special://home/userdata','advancedsettings.xml'))
+
+MOVIES                      =  'special://userdata/addon_data/plugin.video.MediaHubIPTV/Recordings/test.mp4'
 
 KODIV        = float(xbmc.getInfoLabel("System.BuildVersion")[:4])
 #########################################
@@ -73,6 +77,8 @@ def start():
 			tools.addDir('Search','url',5,icon,fanart,'')
 			tools.addDir('Settings','url',8,icon,fanart,'')
 			tools.addDir('Extras','url',16,icon,fanart,'')
+			if not control.setting('review')=='true':
+				tools.addDir('[COLOR blue][B]Click To Leave a Review![/B][/COLOR]','url',21,icon,fanart,'')
 def home():
 	tools.addDir('Account Information','url',6,icon,fanart,'')
 	tools.addDir('Live TV','live',1,icon,fanart,'')
@@ -83,6 +89,9 @@ def home():
 	tools.addDir('Search','',5,icon,fanart,'')
 	tools.addDir('Settings','url',8,icon,fanart,'')
 	tools.addDir('Extras','url',16,icon,fanart,'')
+	tools.addDir('Info','url',22,icon,fanart,'')
+	if not control.setting('review')=='true':
+		tools.addDir('[COLOR blue][B]Click To Leave a Review![/B][/COLOR]','url',21,icon,fanart,'')
 		
 def livecategory(url):
 	
@@ -92,7 +101,9 @@ def livecategory(url):
 		name = tools.regex_from_to(a,'<title>','</title>')
 		name = base64.b64decode(name)
 		url1  = tools.regex_from_to(a,'<playlist_url>','</playlist_url>').replace('<![CDATA[','').replace(']]>','')
-		tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),url1,2,icon,fanart,'')
+		if not 'Install Videos' in name:
+			if not 'TEST CHANNELS' in name:
+				tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),url1,2,icon,fanart,'')
 		
 def Livelist(url):
 	url  = buildcleanurl(url)
@@ -182,9 +193,11 @@ def listcatchup():
 	for a in all:
 		if '"tv_archive":1' in a:
 			name = tools.regex_from_to(a,'"epg_channel_id":"','"')
-			thumb= tools.regex_from_to(a,'"stream_icon":"','"').replace('\/','/')
-			id   = tools.regex_from_to(a,'stream_id":"','"')
-			tools.addDir(name.replace('ENT:','[COLOR blue]ENT:[/COLOR]').replace('DOC:','[COLOR blue]DOC:[/COLOR]').replace('MOV:','[COLOR blue]MOV:[/COLOR]').replace('SSS:','[COLOR blue]SSS[/COLOR]').replace('BTS:','[COLOR blue]BTS:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),'url',13,thumb,fanart,id)
+			if not 'SKY C' in name:
+				if not 'SKY S' in name:
+					thumb= tools.regex_from_to(a,'"stream_icon":"','"').replace('\/','/')
+					id   = tools.regex_from_to(a,'stream_id":"','"')
+					tools.addDir(name.replace('ENT:','[COLOR blue]ENT:[/COLOR]').replace('DOC:','[COLOR blue]DOC:[/COLOR]').replace('MOV:','[COLOR blue]MOV:[/COLOR]').replace('SSS:','[COLOR blue]SSS[/COLOR]').replace('BTS:','[COLOR blue]BTS:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),'url',13,thumb,fanart,id)
 			
 
 def tvarchive(name,description):
@@ -295,7 +308,7 @@ def search():
 		return False
 	text = searchdialog()
 	if not text:
-		xbmc.executebuiltin("XBMC.Notification([COLOR red][B]Search is Empty[/B][/COLOR],Aborting search,4000,"+icon+")")
+		xbmc.executebuiltin("XBMC.Notification([COLOR blue][B]Search is Empty[/B][/COLOR],Aborting search,4000,"+icon+")")
 		return
 	xbmc.log(str(text))
 	open = tools.OPEN_URL(panel_api)
@@ -583,7 +596,7 @@ def get():
 	url  = 'http://www.wheresthematch.com/live-football-on-tv/'
 	open = tools.OPEN_URL(url)
 	all_lists = tools.regex_get_all(open,'<td class="home-team">','</tr>')
-	tools.addDir('[COLOR red]Only Shows Main Matches Find More at - http://liveonsat.com[/COLOR]','url',500,icon,fanart,'')
+	tools.addDir('[COLOR blue]Only Shows Main Matches - Find More at http://liveonsat.com[/COLOR]','url',500,icon,fanart,'')
 	for a in all_lists:
 		name = re.compile('<em class="">(.*?)<em class="">(.*?)</em>.*?<em class="">(.*?)</em>',re.DOTALL).findall(a)
 		for home,v,away in name:
@@ -673,6 +686,103 @@ def report(url):
 	xbmc.executebuiltin('Dialog.Close(busydialog)')
 	
 	xbmcgui.Dialog().ok('MediaHub IPTV','Thank You for Reporting %s The Reported Channel Will be Backup Soon'%url)
+	
+	return
+	
+def review():
+	
+	uname     = xbmcaddon.Addon().getSetting('Username')
+	if not'@' in uname:
+		uname = uname+'@noemail.com'
+
+		
+	kb = xbmc.Keyboard ('', 'Please Enter Your Name', False)
+	kb.doModal()
+	if (kb.isConfirmed()):
+		name = kb.getText()
+		
+		if name =="":
+			xbmcgui.Dialog().ok('MediaHub IPTV','Empty Field')
+			return
+	else:
+		return
+		
+	kb = xbmc.Keyboard ('', 'Please Enter A Title For Your Review', False)
+	kb.doModal()
+	if (kb.isConfirmed()):
+		rtitle = kb.getText()
+		
+		if rtitle =="":
+			xbmcgui.Dialog().ok('MediaHub IPTV','Empty Field')
+			return
+	else:
+		return
+	
+	kb = xbmc.Keyboard ('', 'Please Enter Your Review', False)
+	kb.doModal()
+	if (kb.isConfirmed()):
+		review = kb.getText()
+		
+		if review =="":
+			xbmcgui.Dialog().ok('MediaHub IPTV','Empty Field')
+			return
+	else:
+		return
+		
+	d = xbmcgui.Dialog().select('Please Select a Star Rating',['5 Star','4 Star','3 Star','2 Star','1 Star'])
+	
+	if d==0:
+		star = '5'
+	elif d==1:
+		star = '4'
+	elif d==2:
+		star = '3'
+	elif d==3:
+		star = '2'
+	elif d==4:
+		star = '1'
+		
+	
+	
+	
+	xbmc.executebuiltin('ActivateWindow(busydialog)')
+	
+	
+	report     = 'http://mediahubiptv.co.uk/wp-admin/admin-ajax.php?action=wpcr3-ajax'
+	
+	
+	headers={'Host':'mediahubiptv.co.uk',
+					'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0',
+					'Accept':'application/json, text/javascript, */*; q=0.01',
+					'Accept-Language':'en-US,en;q=0.5',
+					'Accept-Encoding':'gzip, deflate',
+					'Referer':'http://mediahubiptv.co.uk/reviews',
+					'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8',
+					'X-Requeted-With':'XMLHttpRequest',
+					'Content-Length':'224',
+					'Connection':'keep-alive'}
+					
+	data={'wpcr3_fname':name,
+					'wpcr3_femail':uname,
+					'wpcr3_fwebsite':'',
+					'wpcr3_ftitle':rtitle,
+					'wpcr3_frating':star,
+					'wpcr3_ftext':review,
+					'wpcr3_postid':'42',
+					'website':'',
+					'url':'',
+					'wpcr3_fconfirm1':'0',
+					'wpcr3_fconfirm2':'1',
+					'wpcr3_fconfirm3':'1',
+					'wpcr3_checkid':'42',
+					'wpcr3_ajaxAct':'form'}
+
+	
+	requests.post(report, data=data, headers=headers)
+	
+	xbmc.executebuiltin('Dialog.Close(busydialog)')
+	
+	xbmcgui.Dialog().ok('MediaHub IPTV','Your Review Has been Submitted to mediahubiptv.co.uk','Thankyou For Your Time and Effort %s'%username)
 	
 	return
 
@@ -780,5 +890,8 @@ elif mode==19:
 
 elif mode==20:
 	report(url)
+
+elif mode==21:
+	review()
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))

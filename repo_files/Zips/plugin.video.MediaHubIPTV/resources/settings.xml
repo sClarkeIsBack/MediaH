@@ -2,8 +2,10 @@
 <category label="General">
      <setting id="Username" type="text" label="Username" default=""/>
      <setting id="Password" type="text" label="Password" default=""/>
+	 <setting id="review" type="bool" label="Hide 'Click to Leave a Review'" default="false"/>
 	 <setting id="meta" type="bool" label="VOD meta" visible="false" default="true"/>
 	 <setting id="update" type="bool" label="Updates" visible="false" default="true"/>
+	 <setting label="http://mediahubiptv.co.uk" type="lsep"/>
 	 <setting label="http://facebook.com/groups/mhkodi" type="lsep"/>
 </category>
 </settings>
