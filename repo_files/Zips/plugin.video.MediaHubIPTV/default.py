@@ -612,6 +612,72 @@ def footballguidesearch(description):
 			if chan in name.lower():
 				tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),play_url+url+'.ts',4,thumb,fanart,'')
 			
+			
+def report(url):
+
+	t       = str(time.time()).replace('.',',')
+	t       = re.sub(',.+?$','',t)
+	
+	username     = xbmcaddon.Addon().getSetting('Username')
+	if not'@' in username:
+		username = username+'@noemail.com'
+		
+	url          = re.sub('-.*?$','',url)
+	
+	kb = xbmc.Keyboard ('', 'Please Explain The Issue You Are Having', False)
+	kb.doModal()
+	if (kb.isConfirmed()):
+		problem = kb.getText()
+		
+		if problem =="":
+			xbmcgui.Dialog().ok('MediaHub IPTV','You Must Tell Us The Problem You Are Having')
+			return
+	else:
+		return
+	
+	
+	xbmc.executebuiltin('ActivateWindow(busydialog)')
+	
+	
+	report     = 'http://mediahubiptv.co.uk/report-a-channel'
+	
+	open       = tools.OPEN_URL(report)
+	
+	
+	headers={'Host':'mediahubiptv.co.uk',
+					'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0',
+					'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+					'Accept-Language':'en-US,en;q=0.5',
+					'Accept-Encoding':'gzip, deflate',
+					'Referer':'http://mediahubiptv.co.uk/report-a-channel',
+					'Content-Type':'application/x-www-form-urlencoded',
+					'Content-Length':'304',
+					'Connection':'keep-alive'}
+					
+	data={'ccf_field_name-9[first]':'MediaHubIPTV',
+					'ccf_field_name-9[last]':'Addon',
+					'ccf_field_email-10':username,
+					'ccf_field_single-line-text-1':str(url).replace('[COLOR blue]','').replace('[/COLOR]',''),
+					'ccf_field_paragraph-text-4':problem,
+					'ccf_field_dropdown-3':'?',
+					'form_id':'228',
+					'form_page':'http://mediahubiptv.co.uk/report-a-channel',
+					'my_information':'',
+					'ccf_form':'1',
+					'form_nonce':tools.regex_from_to(open,'form_nonce" value="','"')}
+					
+	query={'v':t}
+	
+	requests.post(report,params=query, data=data, headers=headers)
+	
+	xbmc.executebuiltin('Dialog.Close(busydialog)')
+	
+	xbmcgui.Dialog().ok('MediaHub IPTV','Thank You for Reporting %s The Reported Channel Will be Backup Soon'%url)
+	
+	return
+
+	
+
 params=tools.get_params()
 url=None
 name=None
@@ -711,5 +777,8 @@ elif mode==18:
 	
 elif mode==19:
 	get()
+
+elif mode==20:
+	report(url)
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))

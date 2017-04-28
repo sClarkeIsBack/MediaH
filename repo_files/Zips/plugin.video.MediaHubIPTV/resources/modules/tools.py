@@ -23,6 +23,9 @@ def addDir(name,url,mode,iconimage,fanart,description):
 	liz.setProperty('fanart_image', fanart)
 	if mode==4:
 		liz.setProperty("IsPlayable","true")
+		cm = []
+		cm.append(('Report This Channel','XBMC.RunPlugin(plugin://plugin.video.MediaHubIPTV/?mode=20&url='+str(name)+')'))
+		liz.addContextMenuItems(cm,replaceItems=True)
 		ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=False)
 	elif mode==7 or mode==10 or mode==17:
 		liz.setInfo( type="Video", infoLabels={"Title": name,"Plot":description})
@@ -50,7 +53,7 @@ def addDirMeta(name,url,mode,iconimage,fanart,description,year,cast,rating,runti
 
 def OPEN_URL(url):
 	headers = {}
-	headers['User-Agent'] = 'TheWizardIsHere'
+	headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0'
 	link = requests.session().get(url, headers=headers, verify=False).text
 	link = link.encode('ascii', 'ignore')
 	return link
