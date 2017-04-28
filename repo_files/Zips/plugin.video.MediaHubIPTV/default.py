@@ -32,8 +32,6 @@ GuideLoc = xbmc.translatePath(os.path.join('special://home/addons/plugin.video.M
 advanced_settings           =  xbmc.translatePath('special://home/addons/'+addon_id+'/resources/advanced_settings')
 advanced_settings_target    =  xbmc.translatePath(os.path.join('special://home/userdata','advancedsettings.xml'))
 
-MOVIES                      =  'special://userdata/addon_data/plugin.video.MediaHubIPTV/Recordings/test.mp4'
-
 KODIV        = float(xbmc.getInfoLabel("System.BuildVersion")[:4])
 #########################################
 
