@@ -3,7 +3,7 @@ id="plugin.program.MediaHubIPTVWizard"
 version="1.4"
 zip="https://raw.githubusercontent.com/sClarkeIsBack/MediaH/master/wizard/plugin.program.MediaHubWizard.zip"
 
-name="- MediaHub Full Premium Build"
+name="- MediaHub Full Premium Build 16.1"
 version="2.4"
 url="https://archive.org/download/samemilyonline_gmail_New/new.zip" - old - https://archive.org/download/samemilyonline_gmail_Kodi_20170119/Kodi.zip
 gui="http://"
@@ -11,3 +11,13 @@ kodi="16.1"
 theme="http://"
 icon="https://s30.postimg.org/7dfhatjsd/icon.png"
 fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
+
+name="- MediaHub Full Premium Build 17.1"
+version="1.0"
+url="https://archive.org/download/samemilyonline_gmail_Kodi_20170506/Kodi.zip"
+gui="http://"
+kodi="17.1"
+theme="http://"
+icon="https://s30.postimg.org/7dfhatjsd/icon.png"
+fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
+
