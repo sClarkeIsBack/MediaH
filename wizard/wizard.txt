@@ -12,9 +12,9 @@ theme="http://"
 icon="https://s30.postimg.org/7dfhatjsd/icon.png"
 fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
 
-name="- MediaHub Full Premium Build 17.1"
+name="- test"MediaHub Full Premium Build 17.1
 version="1.0"
-url="https://archive.org/download/samemilyonline_gmail_Kodi_20170506/Kodi.zip"
+url="https://archive.org/download/samemilyonline_gmail_Kodi_20170506_2338/Kodi.zip"
 gui="http://"
 kodi="17.1"
 theme="http://"
