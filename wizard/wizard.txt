@@ -13,9 +13,9 @@ icon="https://s30.postimg.org/7dfhatjsd/icon.png"
 fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
 
 
-name="- test"
+name="- test1"
 version="2.4"
-url="https://archive.org/download/samemilyonline_gmail_Kodi_20170507/Kodi.zip" - old - https://archive.org/download/samemilyonline_gmail_Kodi_20170119/Kodi.zip
+url="https://archive.org/download/samemilyonline_gmail_Kodi_20170507_0033/Kodi.zip" - old - https://archive.org/download/samemilyonline_gmail_Kodi_20170119/Kodi.zip
 gui="http://"
 kodi="17.1"
 theme="http://"
