@@ -1,6 +1,6 @@
 id="plugin.program.muttsnutswizard"
 version="1.0"
-zip="http://aftermathwizard.net/repo/zips/plugin.program.aftermathwizard.zip"
+zip="https://github.com/sClarkeIsBack/MediaH/raw/master/wizard/plugin.program.muttsnutswizard.zip"
 
 name="Test build 1"
 version="1.0"
