@@ -1,0 +1,12 @@
+id="plugin.program.muttsnutswizard"
+version="1.0"
+zip="https://raw.githubusercontent.com/sClarkeIsBack/MediaH/master/wizard/plugin.program.MediaHubWizard.zip"
+
+name="- Mutts Nuts Build"
+version="1.0"
+url="http://kodieasywizard.esy.es/MUTTS%20NUTS%20TV%20BUILD%2017.zip"
+gui="http://"
+kodi="17.3"
+theme="http://"
+icon="https://s30.postimg.org/6ze/icon.jpg"
+fanart="https://s30.postimg.org/8bg/fanart.jpg"
