@@ -1,7 +1,6 @@
  #############Imports#############
 import xbmc,xbmcaddon,xbmcgui,xbmcplugin,base64,os,re,unicodedata,requests,time,string,sys,urllib,urllib2,json,urlparse,datetime,zipfile,shutil
 from resources.modules import client,control,tools,shortlinks
-from resources.ivue import ivuesetup
 from datetime import date
 import xml.etree.ElementTree as ElementTree
 
@@ -10,7 +9,7 @@ import xml.etree.ElementTree as ElementTree
 
 #############Defined Strings#############
 addon_id     = 'plugin.video.MediaHubIPTV'
-selfAddon    = xbmcaddon.Addon(id=addon_id)
+addon_name   = 'MediaHub IPTV'
 icon         = xbmc.translatePath(os.path.join('special://home/addons/' + addon_id, 'icon.png'))
 fanart       = xbmc.translatePath(os.path.join('special://home/addons/' + addon_id , 'fanart.jpg'))
 
@@ -68,6 +67,7 @@ def start():
 		if not auth=="":
 			tools.addDir('Account Information','url',6,icon,fanart,'')
 			tools.addDir('Live TV','live',1,icon,fanart,'')
+			tools.addDir('Live Events','events',1,icon,fanart,'')
 			tools.addDir('Catchup TV','url',12,icon,fanart,'')
 			if xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)') or xbmc.getCondVisibility('System.HasAddon(script.ivueguide)'):
 				tools.addDir('TV Guide','pvr',7,icon,fanart,'')
@@ -77,9 +77,11 @@ def start():
 			tools.addDir('Extras','url',16,icon,fanart,'')
 			if not control.setting('review')=='true':
 				tools.addDir('[COLOR blue][B]Click To Leave a Review![/B][/COLOR]','url',21,icon,fanart,'')
+				
 def home():
 	tools.addDir('Account Information','url',6,icon,fanart,'')
 	tools.addDir('Live TV','live',1,icon,fanart,'')
+	tools.addDir('Live Events','events',1,icon,fanart,'')
 	tools.addDir('Catchup TV','url',12,icon,fanart,'')
 	if xbmc.getCondVisibility('System.HasAddon(pvr.iptvsimple)'):
 		tools.addDir('TV Guide','pvr',7,icon,fanart,'')
@@ -87,7 +89,6 @@ def home():
 	tools.addDir('Search','',5,icon,fanart,'')
 	tools.addDir('Settings','url',8,icon,fanart,'')
 	tools.addDir('Extras','url',16,icon,fanart,'')
-	tools.addDir('Info','url',22,icon,fanart,'')
 	if not control.setting('review')=='true':
 		tools.addDir('[COLOR blue][B]Click To Leave a Review![/B][/COLOR]','url',21,icon,fanart,'')
 		
@@ -101,7 +102,12 @@ def livecategory(url):
 		url1  = tools.regex_from_to(a,'<playlist_url>','</playlist_url>').replace('<![CDATA[','').replace(']]>','')
 		if not 'Install Videos' in name:
 			if not 'TEST CHANNELS' in name:
-				tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),url1,2,icon,fanart,'')
+				if url == 'events':
+					if 'Live:' in name:
+						tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),url1,2,icon,fanart,'')
+				else:
+					if not 'Live:' in name:
+						tools.addDir(name.replace('UK:','[COLOR blue]UK:[/COLOR]').replace('USA/CA:','[COLOR blue]USA/CA:[/COLOR]').replace('All','[COLOR blue]A[/COLOR]ll').replace('International','[COLOR blue]Int[/COLOR]ertaional').replace('Live:','[COLOR blue]Live:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),url1,2,icon,fanart,'')
 		
 def Livelist(url):
 	url  = buildcleanurl(url)
@@ -156,33 +162,16 @@ def vod(url):
 				url  = tools.regex_from_to(a,'<stream_url>','</stream_url>').replace('<![CDATA[','').replace(']]>','')
 				desc = tools.regex_from_to(a,'<description>','</description>')
 				tools.addDir(name,url,4,thumb,fanart,base64.b64decode(desc))
+				
+				
 		
-		
-##########################################
-def catchup():
-    loginurl   = "http://mediahubiptv.ddns.net:4545/get.php?username=" + username + "&password=" + password + "&type=m3u_plus&output=ts"
-    try:
-        connection = urllib2.urlopen(loginurl)
-        print connection.getcode()
-        connection.close()
-        #playlist found, user active & login correct, proceed to addon
-        pass
-        
-    except urllib2.HTTPError, e:
-        print e.getcode()
-        dialog.ok("[COLOR white]Expired Account[/COLOR]",'[COLOR white]You cannot use this service with an expired account[/COLOR]',' ','[COLOR white]Please check your account information[/COLOR]')
-        sys.exit(1)
-        xbmc.executebuiltin("Dialog.Close(busydialog)")
+##############################################
+#### RULE NO.1 - DONT WRITE CODE THAT IS  ####
+#### ALREADY WRITTEN AND PROVEN TO WORK :)####
+##############################################
 
-    url = "%s:%s/xmltv.php?username=%s&password=%s"%(host,port,username,password)
-    DownloaderClass(url,GuideLoc + "uide.xml")
-    
-    f = open(Guide, 'r+')
-    input = open(Guide).read().decode('UTF-8')
-    output = unicodedata.normalize('NFKD', input).encode('ASCII', 'ignore')
-    f.write(output)
-    f.truncate()
-    f.close()
+
+def catchup():
     listcatchup()
 		
 def listcatchup():
@@ -193,48 +182,49 @@ def listcatchup():
 			name = tools.regex_from_to(a,'"epg_channel_id":"','"').replace('\/','/')
 			thumb= tools.regex_from_to(a,'"stream_icon":"','"').replace('\/','/')
 			id   = tools.regex_from_to(a,'stream_id":"','"')
-			tools.addDir(name.replace('ENT:','[COLOR blue]ENT:[/COLOR]').replace('DOC:','[COLOR blue]DOC:[/COLOR]').replace('MOV:','[COLOR blue]MOV:[/COLOR]').replace('SSS:','[COLOR blue]SSS:[/COLOR]').replace('BTS:','[COLOR blue]BTS:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),'url',13,thumb,fanart,id)
+			if not name=="":
+				tools.addDir(name.replace('KID:','[COLOR blue]KIDS:[/COLOR]').replace('UKS:','[COLOR blue]UKS:[/COLOR]').replace('ENT:','[COLOR blue]ENT:[/COLOR]').replace('DOC:','[COLOR blue]DOC:[/COLOR]').replace('MOV:','[COLOR blue]MOV:[/COLOR]').replace('SSS:','[COLOR blue]SSS:[/COLOR]').replace('BTS:','[COLOR blue]BTS:[/COLOR]').replace('TEST','[COLOR blue]TEST[/COLOR]').replace('Install','[COLOR blue]Install[/COLOR]').replace('24/7','[COLOR blue]24/7[/COLOR]').replace('INT:','[COLOR blue]INT:[/COLOR]').replace('DE:','[COLOR blue]DE:[/COLOR]').replace('FR:','[COLOR blue]FR:[/COLOR]').replace('PL:','[COLOR blue]PL:[/COLOR]').replace('AR:','[COLOR blue]AR:[/COLOR]').replace('LIVE:','[COLOR blue]LIVE:[/COLOR]').replace('ES:','[COLOR blue]ES:[/COLOR]').replace('IN:','[COLOR blue]IN:[/COLOR]').replace('PK:','[COLOR blue]PK:[/COLOR]'),'url',13,thumb,fanart,id)
 			
 
 def tvarchive(name,description):
-    name = str(name.replace('[COLOR blue]ENT:[/COLOR]','ENT:').replace('[COLOR blue]DOC:[/COLOR]','DOC:').replace('[COLOR blue]MOV:[/COLOR]','MOV:').replace('[COLOR blue]SSS:[/COLOR]','SSS:').replace('[COLOR blue]BTS:[/COLOR]','BTS:').replace('[COLOR blue]INT:[/COLOR]','INT:').replace('[COLOR blue]DE:[/COLOR]','DE:').replace('[COLOR blue]FR:[/COLOR]','FR:').replace('[COLOR blue]PL:[/COLOR]','PL:').replace('[COLOR blue]AR:[/COLOR]','AR:').replace('[COLOR blue]LIVE:[/COLOR]','LIVE:').replace('[COLOR blue]ES:[/COLOR]','ES:').replace('[COLOR blue]IN:[/COLOR]','IN:').replace('[COLOR blue]PK:[/COLOR]','PK'))
-    filename = open(Guide)
-    tree = ElementTree.parse(filename)
-    pony = "apples"
-    import datetime as dt
-    from datetime import time
-    date3 = datetime.datetime.now() - datetime.timedelta(days=5)
-    date = str(date3)
+    days = 7
+	
     now = str(datetime.datetime.now()).replace('-','').replace(':','').replace(' ','')
-    programmes = tree.findall("programme")
-    for programme in programmes:
-        if name in programme.attrib.get('channel'):
-            showtime = programme.attrib.get('start')
-            head, sep, tail = showtime.partition(' +')
-            date = str(date).replace('-','').replace(':','').replace(' ','')
-            year, month, day = showtime.partition('2017')
-            kanalinimi = programme.find('title').text + showtime
-            day = day[:-6]
-            if head > date:
-                if head < now:
-                    head2 = head
-                    head2 = head2[:4] + '/' + head2[4:]
-                    head = head[:4] + '-' + head[4:]
-                    head2 = head2[:7] + '/' + head2[7:]
-                    head = head[:7] + '-' + head[7:]
-                    head2 = head2[:10] + ' - ' + head2[10:]
-                    head = head[:10] + ':' + head[10:]
-                    head2 = head2[:15] + ':' + head2[15:]
-                    head = head[:13] + '-' + head[13:]
-                    head2 = head2[:-2]
-                    head = head[:-2]
-                    poo1 = ("%s:%s/streaming/timeshift.php?username=%s&password=%s&stream=%s&start=")%(host,port,username,password,description)
-                    pony = poo1 + str(head) + "&duration=240"
-                    head2 = '[COLOR blue]%s - [/COLOR]'%head2 
-                    kanalinimi = str(head2)+ programme.find('title').text
-                    desc  = programme.find('desc').text
-                    tools.addDir(kanalinimi,pony,4,icon,fanart,desc)
-                    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+    date3 = datetime.datetime.now() - datetime.timedelta(days)
+    date = str(date3)
+    date = str(date).replace('-','').replace(':','').replace(' ','')
+    APIv2 = base64.b64decode("JXM6JXMvcGxheWVyX2FwaS5waHA/dXNlcm5hbWU9JXMmcGFzc3dvcmQ9JXMmYWN0aW9uPWdldF9zaW1wbGVfZGF0YV90YWJsZSZzdHJlYW1faWQ9JXM=")%(host,port,username,password,description)
+    link=tools.OPEN_URL(APIv2)
+    match = re.compile('"title":"(.+?)".+?"start":"(.+?)","end":"(.+?)","description":"(.+?)"').findall(link)
+    for ShowTitle,start,end,DesC in match:
+        ShowTitle = base64.b64decode(ShowTitle)
+        DesC = base64.b64decode(DesC)
+        format = '%Y-%m-%d %H:%M:%S'
+        try:
+            modend = dtdeep.strptime(end, format)
+            modstart = dtdeep.strptime(start, format)
+        except:
+            modend = datetime.datetime(*(time.strptime(end, format)[0:6]))
+            modstart = datetime.datetime(*(time.strptime(start, format)[0:6]))
+        StreamDuration = modend - modstart
+        modend_ts = time.mktime(modend.timetuple())
+        modstart_ts = time.mktime(modstart.timetuple())
+        FinalDuration = int(modend_ts-modstart_ts) / 60
+        strstart = start
+        Realstart = str(strstart).replace('-','').replace(':','').replace(' ','')
+        start2 = start[:-3]
+        editstart = start2
+        start2 = str(start2).replace(' ',' - ')
+        start = str(editstart).replace(' ',':')
+        Editstart = start[:13] + '-' + start[13:]
+        Finalstart = Editstart.replace('-:','-')
+        if Realstart > date:
+            if Realstart < now:
+                catchupURL = base64.b64decode("JXM6JXMvc3RyZWFtaW5nL3RpbWVzaGlmdC5waHA/dXNlcm5hbWU9JXMmcGFzc3dvcmQ9JXMmc3RyZWFtPSVzJnN0YXJ0PQ==")%(host,port,username,password,description)
+                ResultURL = catchupURL + str(Finalstart) + "&duration=%s"%(FinalDuration)
+                kanalinimi = "[COLOR blue]%s[/COLOR] - %s"%(start2,ShowTitle)
+                tools.addDir(kanalinimi,ResultURL,4,icon,fanart,DesC)
+
 	
 					
 def DownloaderClass(url, dest):
@@ -540,14 +530,103 @@ def correctPVR():
 	xbmc.executebuiltin("Container.Refresh")
 	
 def ivueint():
-	xbmc.executebuiltin("ActivateWindow(busydialog)")
-	ivuesetup.iVueInt()
-	xbmc.executebuiltin("Dialog.Close(busydialog)")
-	if str(KODIV).startswith('17'):
-		activate  = '{"jsonrpc":"2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"script.ivueguide","enabled":true}, "id":1}'
-		activate2 = '{"jsonrpc":"2.0", "method":"Addons.SetAddonEnabled","params":{"addonid":"xbmc.repo.ivueguide","enabled":true}, "id":1}'
-		xbmc.executeJSONRPC(activate)
-		xbmc.executeJSONRPC(activate2)
+	iVue_SETTINGS = xbmc.translatePath(os.path.join('special://home/userdata/addon_data/script.ivueguide','settings.xml'))
+	UseriVueSets = xbmc.translatePath(os.path.join('special://home/userdata/addon_data/script.ivueguide','oldsettings.xml'))
+	FlawiVueSet = xbmc.translatePath(os.path.join('special://home/addons/'+addon_id+'/resources/ivue','ivueset.xml'))
+	ivuetarget   =  xbmc.translatePath(os.path.join('special://home/userdata/addon_data/script.ivueguide/resources/ini/plugin.video.MediaHubIPTV'))
+	inizip       = 	xbmc.translatePath(os.path.join('special://home/addons/plugin.video.MediaHubIPTV/resources/ivue','plugin.video.MediaHubIPTV.zip'))
+	iVue_DATA = xbmc.translatePath(os.path.join('special://home/userdata/addon_data/script.ivueguide/'))
+	RES = xbmc.translatePath('special://home/addons/plugin.video.MediaHubIPTV/resources/ivue/')
+	if not xbmc.getCondVisibility('System.HasAddon(script.ivueguide)'):
+		install('iVue','https://raw.githubusercontent.com/totaltec2014/ivue2/master/script.ivueguide/script.ivueguide-3.0.7.zip')
+		xbmc.executebuiltin("UpdateAddonRepos")
+		xbmc.executebuiltin("UpdateLocalAddons")
+		time.sleep(5)
+
+	if not xbmc.getCondVisibility('System.HasAddon(xbmc.repo.ivueguide)'):
+		install('iVue','https://raw.githubusercontent.com/totaltec2014/ivue2/master/xbmc.repo.ivueguide/xbmc.repo.ivueguide-0.0.1.zip')
+		xbmc.executebuiltin("UpdateAddonRepos")
+		xbmc.executebuiltin("UpdateLocalAddons")
+		time.sleep(5)
+
+	if not os.path.isfile(iVue_SETTINGS):
+		if not os.path.exists(iVue_DATA):
+			os.makedirs(iVue_DATA)
+		shutil.copyfile(FlawiVueSet, iVue_SETTINGS)
+	else:
+		os.remove(iVue_SETTINGS)
+		xbmc.log('Old iVue settings deleted')
+		if not os.path.exists(iVue_DATA):
+			os.makedirs(iVue_DATA)
+		shutil.copyfile(FlawiVueSet, iVue_SETTINGS)
+	
+	iVueEnable 	   = '{"jsonrpc":"2.0","method":"Addons.SetAddonEnabled","params":{"addonid":"script.ivueguide","enabled":true},"id":1}'
+	iVueRepoEnable 	   = '{"jsonrpc":"2.0","method":"Addons.SetAddonEnabled","params":{"addonid":"xbmc.repo.ivueguide","enabled":true},"id":1}'
+	xbmc.executeJSONRPC(iVueEnable)
+	xbmc.executeJSONRPC(iVueRepoEnable)
+
+	FullDB = os.path.join(RES, 'fullivue.zip')
+	dp = xbmcgui.DialogProgress()
+	dp.create("[COLOR white]"+addon_name+"[/COLOR]","Copying DB",'', 'Please Wait')
+	unzip(FullDB,iVue_DATA,dp)
+	xbmc.log("Full iVue Master DB Copied")
+	
+	dp = xbmcgui.DialogProgress()
+	dp.create("MediaHubIPTV","Copying ini",'', 'Please Wait')
+	unzip(inizip,ivuetarget,dp)
+
+def install(name,url):
+    from resources.modules import downloader
+    path = xbmc.translatePath(os.path.join('special://home/addons','packages'))
+    dp = xbmcgui.DialogProgress()
+    dp.create("[COLOR white]"+addon_name+"[/COLOR]","Installing...",'', 'Please Wait')
+    lib=os.path.join(path, 'content.zip')
+    try:
+       os.remove(lib)
+    except:
+       pass
+    downloader.download(url, lib, dp)
+    addonfolder = xbmc.translatePath(os.path.join('special://home','addons'))
+    time.sleep(3)
+    dp = xbmcgui.DialogProgress()
+    dp.create("[COLOR white]"+addon_name+"[/COLOR]","Installing...",'', 'Please Wait')
+    dp.update(0,"", "Installing... Please Wait")
+    print '======================================='
+    print addonfolder
+    print '======================================='
+    unzip(lib,addonfolder,dp)
+
+def unzip(_in, _out, dp):
+	__in = zipfile.ZipFile(_in,  'r')
+	
+	nofiles = float(len(__in.infolist()))
+	count   = 0
+	
+	try:
+		for item in __in.infolist():
+			count += 1
+			update = (count / nofiles) * 100
+			
+			if dp.iscanceled():
+				dialog = xbmcgui.Dialog()
+				dialog.ok(AddonTitle, 'Process was cancelled.')
+				
+				sys.exit()
+				dp.close()
+			
+			try:
+				dp.update(int(update))
+				__in.extract(item, _out)
+			
+			except Exception, e:
+				print str(e)
+
+	except Exception, e:
+		print str(e)
+		return False
+		
+	return True	
+
 	
 def tvguidesetup():
 		dialog = xbmcgui.Dialog().yesno('MediaHubIPTV','Would You like us to Setup the TV Guide for You?')
