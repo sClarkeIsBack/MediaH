@@ -32,6 +32,7 @@ advanced_settings           =  xbmc.translatePath('special://home/addons/'+addon
 advanced_settings_target    =  xbmc.translatePath(os.path.join('special://home/userdata','advancedsettings.xml'))
 
 KODIV        = float(xbmc.getInfoLabel("System.BuildVersion")[:4])
+RAM          = xbmc.getInfoLabel("System.Memory(total)")
 #########################################
 
 def buildcleanurl(url):
@@ -399,6 +400,9 @@ def addonsettings(url,description):
 		else:
 			xbmcaddon.Addon().setSetting('update','true')
 			xbmc.executebuiltin('Container.Refresh')
+	elif url.endswith('.apk'):
+		from resources.modules import apkinstaller
+		apkinstaller.install(description,url)
 	
 		
 def advancedsettings(device):
@@ -503,6 +507,8 @@ def accountinfo():
 			tools.addDir('[COLOR blue]Local IP Address:[/COLOR] '+ip,'','',icon,fanart,'')
 			tools.addDir('[COLOR blue]External IP Address:[/COLOR] '+extip,'','',icon,fanart,'')
 			tools.addDir('[COLOR blue]Kodi Version:[/COLOR] '+str(KODIV),'','',icon,fanart,'')
+			tools.addDir('[COLOR blue]RAM:[/COLOR] '+str(RAM),'','',icon,fanart,'')
+			
 	except:
 		pass
 		
@@ -665,6 +671,7 @@ def extras():
 	tools.addDir('Integrate With TV Guide','tv',10,icon,fanart,'')
 	tools.addDir('Run a Speed Test','ST',10,icon,fanart,'')
 	tools.addDir('Football Guide','url',19,icon,fanart,'')
+	tools.addDir('APK Installer','apk',22,icon,fanart,'')
 	tools.addDir('Clear Cache','CC',10,icon,fanart,'')
 	
 def get():
@@ -860,6 +867,13 @@ def review():
 	xbmcgui.Dialog().ok('MediaHub IPTV','Your Review Has been Submitted to mediahubiptv.co.uk','Thankyou For Your Time and Effort %s'%username)
 	
 	return
+	
+	
+def apkdownloads():
+	open = requests.get('http://mediahubiptv.co.uk/kodi/apps.txt').text
+	all  = re.compile('<item>.+?title>(.+?)<.+?link>(.+?)<.+?thumbnail>(.+?)<',re.DOTALL|re.MULTILINE).findall(open)
+	for name,url,icon in all:
+		tools.addDir(name,url,10,icon,fanart,name)
 
 	
 
@@ -968,5 +982,8 @@ elif mode==20:
 
 elif mode==21:
 	review()
+
+elif mode==22:
+	apkdownloads()
 
 xbmcplugin.endOfDirectory(int(sys.argv[1]))

@@ -5,7 +5,7 @@ from urllib import FancyURLopener
 import sys
 
 class MyOpener(FancyURLopener):
-	version = 'Flawless'
+	version = 'MediaHubIPTV'
 
 myopener = MyOpener()
 urlretrieve = MyOpener().retrieve
@@ -41,14 +41,14 @@ def _pbhook(numblocks, blocksize, filesize, dp, start_time):
             total = float(filesize) / (1024 * 1024) 
             mbs = '[COLOR white]%.02f MB[/COLOR] of %.02f MB' % (currently_downloaded, total)
             e = 'Speed: [COLOR lime]%.02f Mb/s ' % mbps_speed  + '[/COLOR]'
-            e += 'ETA: [COLOR yellow]%02d:%02d' % divmod(eta, 60) + '[/COLOR]'
+            e += 'ETA: [COLOR blue]%02d:%02d' % divmod(eta, 60) + '[/COLOR]'
             dp.update(percent, mbs, e)
         except: 
             percent = 100 
             dp.update(percent) 
         if dp.iscanceled():
             dialog = xbmcgui.Dialog()
-            dialog.ok("Flawless", 'The download was cancelled.')
+            dialog.ok("MediaHubIPTV", 'The download was cancelled.')
 				
             sys.exit()
             dp.close()
