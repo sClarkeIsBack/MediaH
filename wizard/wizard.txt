@@ -14,7 +14,7 @@ fanart="https://s30.postimg.org/6ze5b7zot/fanart.jpg"
 
 name="t"
 version="1.0"
-url="https://archive.org/download/samemilyonline_gmail_Kodi_20170724_2123/Kodi.zip"
+url="https://archive.org/download/samemilyonline_gmail_Kodi_201708/Kodi.zip"
 gui="http://"
 kodi="17.3"
 theme="http://"
